@@ -1,0 +1,40 @@
+name: Deploy Dev Environment
+
+on:
+  push:
+    branches:
+      - dev  # Adjust to the branch you want to trigger the action
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Authenticate to Azure using OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID_DEV }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID_DEV }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        working-directory: ./terraform/dev
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: ./terraform/dev
+        run: terraform plan -out=plan.tfplan
+
+      - name: Terraform Apply
+        working-directory: ./terraform/dev
+        run: terraform apply -auto-approve plan.tfplan
