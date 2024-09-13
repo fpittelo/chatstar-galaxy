@@ -34,8 +34,8 @@ jobs:
 
       - name: Terraform Plan
         working-directory: ./terraform/dev
-        run: terraform plan -out=plan.tfplan
+        run: terraform plan
 
       - name: Terraform Apply
         working-directory: ./terraform/dev
-        run: terraform apply -auto-approve plan.tfplan
+        run: terraform apply -auto-approve
