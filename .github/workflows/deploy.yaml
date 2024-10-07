@@ -1,17 +1,18 @@
-name: Deploy Dev Environment
+name: Deploy Environment
 
 on:
-  push:
-    branches: [ dev ]  # Triggers on push to dev
-#   workflow_dispatch: # Enables manual triggering of the workflow
+  pull_request:
+    types:
+      - closed  # Trigger when a pull request is closed (including merged)
 
 permissions:
-  id-token: write
-  contents: read
+  id-token: write  # Required for OIDC authentication
+  contents: read   # Default permission for accessing the repo
 
 jobs:
   deploy-dev:
     name: Deploy Dev Resources
+    if: github.event.pull_request.merged == true && (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     environment: AZURE #must match the federated credential "based on selection"
     steps:
